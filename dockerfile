@@ -10,4 +10,4 @@ COPY . .
 ENV PORT=8000
 EXPOSE 8000
 
-CMD ["python", "inference.py"]
+CMD ["sh", "-c", "uvicorn inference:app --host 0.0.0.0 --port ${PORT}"]
