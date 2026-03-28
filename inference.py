@@ -1,27 +1,24 @@
-
-
-from flask import Flask, request, jsonify
+from fastapi import FastAPI, Request
 import os
 
-app = Flask(__name__)
+app = FastAPI()
 
-@app.route("/", methods=["GET"])
+@app.get("/")
 def home():
-    return jsonify({"message": "running"}), 200
+    return {"message": "running"}
 
 # Support both possible reset paths
-@app.route("/reset", methods=["POST"])
-@app.route("/openenv/reset", methods=["POST"])
-def reset():
-    return jsonify({"status": "success", "message": "reset ok"}), 200
+@app.post("/reset")
+@app.post("/openenv/reset")
+async def reset(request: Request):
+    return {"status": "success", "message": "reset ok"}
 
 # Support both possible validate paths
-@app.route("/validate", methods=["POST"])
-@app.route("/openenv/validate", methods=["POST"])
-def validate():
-    data = request.get_json(silent=True) or {}
-    return jsonify({"status": "success", "message": "validate ok", "received": data}), 200
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
-    app.run(host="0.0.0.0", port=port)
+@app.post("/validate")
+@app.post("/openenv/validate")
+async def validate(request: Request):
+    try:
+        data = await request.json()
+    except Exception:
+        data = {}
+    return {"status": "success", "message": "validate ok", "received": data}
